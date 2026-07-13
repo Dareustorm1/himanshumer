@@ -1254,7 +1254,7 @@ export default function InsideHead() {
                 </div>
               )}
 
-              <div className="flex items-center gap-2.5 flex-wrap">
+              <div className="flex items-center gap-2.5 flex-nowrap shrink-0">
                 <div className="flex border border-white/10 rounded overflow-hidden">
                   <button onClick={() => setZoom(z => Math.max(0.4, z - 0.15))} className="px-3 py-2 bg-white/5 hover:bg-white/10 border-r border-white/10 text-white">−</button>
                   <span className="px-3 py-2 text-neutral-400 bg-neutral-900 min-w-[50px] text-center">{Math.round(zoom * 100)}%</span>
