@@ -125,6 +125,8 @@ export default function InsideHead() {
   const [notebookSaveStatus, setNotebookSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [errorDetails, setErrorDetails] = useState<FirebaseErrorDetails | null>(null);
+  const [confirmResetWall, setConfirmResetWall] = useState(false);
+  const [confirmResetNotebook, setConfirmResetNotebook] = useState(false);
 
   const hasUnsavedWallRef = useRef(false);
   const hasUnsavedNotebookRef = useRef(false);
@@ -741,12 +743,6 @@ export default function InsideHead() {
   // ─── Reset ───────────────────────────────────────────────────────────────
 
   const resetWall = async () => {
-    if (isAdminMode) {
-      if (!window.confirm("RESET BRAIN WALL DATA? THIS WILL DISCARD UNSAVED CHANGES.")) {
-        return;
-      }
-    }
-    
     if (isFirebaseConfigured && db) {
       const firebaseNodes = await getFirebaseNodes(DEFAULT_NODES);
       const firebaseConnections = await getFirebaseConnections(DEFAULT_CONNECTIONS);
@@ -766,15 +762,10 @@ export default function InsideHead() {
     setHasUnsavedWall(false);
     setSelectedNodeId(null); setLinkFromId(null);
     setZoom(1); setPan({ x: 0, y: 0 });
+    setConfirmResetWall(false);
   };
 
   const resetNotebook = async () => {
-    if (isAdminMode) {
-      if (!window.confirm("RESET NOTEBOOK DATA? THIS WILL DISCARD UNSAVED CHANGES.")) {
-        return;
-      }
-    }
-    
     if (isFirebaseConfigured && db) {
       const firebaseNotebook = await getFirebaseNotebook(
         DEFAULT_NOTEBOOK_PAGES,
@@ -798,6 +789,7 @@ export default function InsideHead() {
     }
     setHasUnsavedNotebook(false);
     setActivePageIdx(0);
+    setConfirmResetNotebook(false);
   };
 
   // ─── Admin mode ───────────────────────────────────────────────────────────
@@ -1228,9 +1220,17 @@ export default function InsideHead() {
                 <button onClick={() => setZoom(z => Math.min(2.5, z + 0.15))} className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white">+</button>
               </div>
               <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="px-4 py-2 border border-white/10 rounded hover:border-white text-neutral-400 hover:text-white interactive-item">FIT</button>
-              <button onClick={resetWall} className="px-4 py-2 border border-white/10 rounded hover:border-white text-neutral-400 hover:text-white flex items-center gap-1.5 interactive-item">
-                <RotateCcw className="w-3.5 h-3.5" /> RESET
-              </button>
+              {isAdminMode && (
+                confirmResetWall
+                  ? <span className="flex items-center gap-1.5 font-mono text-[9px]">
+                      <span className="text-amber-400">Sure?</span>
+                      <button type="button" onClick={resetWall} className="px-2.5 py-1.5 bg-red-900/40 border border-red-500/30 text-red-400 rounded hover:bg-red-900/60 transition-colors">YES</button>
+                      <button type="button" onClick={() => setConfirmResetWall(false)} className="px-2.5 py-1.5 border border-white/10 text-neutral-400 rounded hover:border-white/30 transition-colors">NO</button>
+                    </span>
+                  : <button type="button" onClick={() => setConfirmResetWall(true)} className="px-4 py-2 border border-white/10 rounded hover:border-red-500/40 text-neutral-400 hover:text-red-400 flex items-center gap-1.5 interactive-item transition-colors">
+                      <RotateCcw className="w-3.5 h-3.5" /> RESET
+                    </button>
+              )}
               <button onClick={toggleAdmin} className={`px-4 py-2 border rounded flex items-center gap-2 interactive-item ${isAdminMode ? 'border-[#C62828] bg-[#C62828]/10 text-white' : 'border-white/10 text-neutral-400 hover:text-white'}`}>
                 {isAdminMode ? <Lock className="w-3.5 h-3.5 text-[#C62828]" /> : <Unlock className="w-3.5 h-3.5" />}
                 {isAdminMode ? 'ADMIN' : 'VISITOR'}
@@ -1483,9 +1483,17 @@ export default function InsideHead() {
                   </button>
                 </div>
               )}
-              <button onClick={resetNotebook} className="px-4 py-2 border border-white/10 rounded hover:border-white text-neutral-400 hover:text-white flex items-center gap-1.5 interactive-item">
-                <RotateCcw className="w-3.5 h-3.5" /> Reset
-              </button>
+              {isAdminMode && (
+                confirmResetNotebook
+                  ? <span className="flex items-center gap-1.5 font-mono text-[9px]">
+                      <span className="text-amber-400">Sure?</span>
+                      <button type="button" onClick={resetNotebook} className="px-2.5 py-1.5 bg-red-900/40 border border-red-500/30 text-red-400 rounded hover:bg-red-900/60 transition-colors">YES</button>
+                      <button type="button" onClick={() => setConfirmResetNotebook(false)} className="px-2.5 py-1.5 border border-white/10 text-neutral-400 rounded hover:border-white/30 transition-colors">NO</button>
+                    </span>
+                  : <button type="button" onClick={() => setConfirmResetNotebook(true)} className="px-4 py-2 border border-white/10 rounded hover:border-red-500/40 text-neutral-400 hover:text-red-400 flex items-center gap-1.5 interactive-item transition-colors">
+                      <RotateCcw className="w-3.5 h-3.5" /> Reset
+                    </button>
+              )}
               <button onClick={toggleAdmin} className={`px-4 py-2 border rounded flex items-center gap-2 interactive-item ${isAdminMode ? 'border-[#C62828] bg-[#C62828]/10 text-white' : 'border-white/10 text-neutral-400 hover:text-white'}`}>
                 {isAdminMode ? <Lock className="w-3.5 h-3.5 text-[#C62828]" /> : <Unlock className="w-3.5 h-3.5" />}
                 {isAdminMode ? 'ADMIN' : 'VISITOR'}
