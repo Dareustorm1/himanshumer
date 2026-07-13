@@ -269,6 +269,10 @@ export default function Filmography() {
     if (primary) {
       if (primary.coverImage) return resolveImageUrl(primary.coverImage);
       if (primary.thumbnail) return resolveImageUrl(primary.thumbnail);
+      if (primary.url) {
+        const resolved = resolveImageUrl(primary.url);
+        if (resolved !== primary.url) return resolved;
+      }
       if (primary.sourceType === 'local' && primary.type === 'image') return resolveImageUrl(primary.url);
     }
     if (project.presentation.coverImage) return resolveImageUrl(project.presentation.coverImage);
