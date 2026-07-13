@@ -743,53 +743,63 @@ export default function InsideHead() {
   // ─── Reset ───────────────────────────────────────────────────────────────
 
   const resetWall = async () => {
-    if (isFirebaseConfigured && db) {
-      const firebaseNodes = await getFirebaseNodes(DEFAULT_NODES);
-      const firebaseConnections = await getFirebaseConnections(DEFAULT_CONNECTIONS);
-      setNodes(firebaseNodes as any);
-      setConnections(firebaseConnections);
-    } else {
-      localStorage.removeItem(VISITOR_KEY);
-      const admin = localStorage.getItem(ADMIN_KEY);
-      if (admin) {
-        const p = JSON.parse(admin);
-        setNodes(p.nodes || DEFAULT_NODES);
-        setConnections(p.connections || DEFAULT_CONNECTIONS);
+    if (isAdminMode) {
+      // Admin: reload saved data from Firebase
+      if (isFirebaseConfigured && db) {
+        const firebaseNodes = await getFirebaseNodes(DEFAULT_NODES);
+        const firebaseConnections = await getFirebaseConnections(DEFAULT_CONNECTIONS);
+        setNodes(firebaseNodes as any);
+        setConnections(firebaseConnections);
       } else {
-        setNodes(DEFAULT_NODES); setConnections(DEFAULT_CONNECTIONS);
+        const admin = localStorage.getItem(ADMIN_KEY);
+        if (admin) {
+          const p = JSON.parse(admin);
+          setNodes(p.nodes || DEFAULT_NODES);
+          setConnections(p.connections || DEFAULT_CONNECTIONS);
+        } else {
+          setNodes(DEFAULT_NODES as any); setConnections(DEFAULT_CONNECTIONS);
+        }
       }
+      setHasUnsavedWall(false);
+      setConfirmResetWall(false);
+    } else {
+      // Visitor: wipe their local saved positions so refresh also resets
+      localStorage.removeItem(VISITOR_KEY);
+      setNodes(DEFAULT_NODES as any);
+      setConnections(DEFAULT_CONNECTIONS);
     }
-    setHasUnsavedWall(false);
     setSelectedNodeId(null); setLinkFromId(null);
     setZoom(1); setPan({ x: 0, y: 0 });
-    setConfirmResetWall(false);
   };
 
   const resetNotebook = async () => {
-    if (isFirebaseConfigured && db) {
-      const firebaseNotebook = await getFirebaseNotebook(
-        DEFAULT_NOTEBOOK_PAGES,
-        [],
-        []
-      );
-      setNotebookPages(firebaseNotebook.pages);
-      setFoldedPages(firebaseNotebook.folded);
-      setBookmarks(firebaseNotebook.bookmarks);
-    } else {
-      localStorage.removeItem(NOTEBOOK_VISITOR_KEY);
-      const admin = localStorage.getItem(NOTEBOOK_ADMIN_KEY);
-      if (admin) {
-        const p = JSON.parse(admin);
-        setNotebookPages(p.pages || DEFAULT_NOTEBOOK_PAGES);
-        setFoldedPages(p.folded || []); setBookmarks(p.bookmarks || []);
+    if (isAdminMode) {
+      // Admin: reload saved data from Firebase
+      if (isFirebaseConfigured && db) {
+        const firebaseNotebook = await getFirebaseNotebook(DEFAULT_NOTEBOOK_PAGES, [], []);
+        setNotebookPages(firebaseNotebook.pages);
+        setFoldedPages(firebaseNotebook.folded);
+        setBookmarks(firebaseNotebook.bookmarks);
       } else {
-        setNotebookPages(DEFAULT_NOTEBOOK_PAGES);
-        setFoldedPages([]); setBookmarks([]);
+        const admin = localStorage.getItem(NOTEBOOK_ADMIN_KEY);
+        if (admin) {
+          const p = JSON.parse(admin);
+          setNotebookPages(p.pages || DEFAULT_NOTEBOOK_PAGES);
+          setFoldedPages(p.folded || []); setBookmarks(p.bookmarks || []);
+        } else {
+          setNotebookPages(DEFAULT_NOTEBOOK_PAGES);
+          setFoldedPages([]); setBookmarks([]);
+        }
       }
+      setHasUnsavedNotebook(false);
+      setConfirmResetNotebook(false);
+    } else {
+      // Visitor: wipe their local saved state so refresh also resets
+      localStorage.removeItem(NOTEBOOK_VISITOR_KEY);
+      setNotebookPages(DEFAULT_NOTEBOOK_PAGES);
+      setFoldedPages([]); setBookmarks([]);
     }
-    setHasUnsavedNotebook(false);
     setActivePageIdx(0);
-    setConfirmResetNotebook(false);
   };
 
   // ─── Admin mode ───────────────────────────────────────────────────────────
@@ -1220,8 +1230,8 @@ export default function InsideHead() {
                 <button onClick={() => setZoom(z => Math.min(2.5, z + 0.15))} className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white">+</button>
               </div>
               <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="px-4 py-2 border border-white/10 rounded hover:border-white text-neutral-400 hover:text-white interactive-item">FIT</button>
-              {isAdminMode && (
-                confirmResetWall
+              {isAdminMode
+                ? confirmResetWall
                   ? <span className="flex items-center gap-1.5 font-mono text-[9px]">
                       <span className="text-amber-400">Sure?</span>
                       <button type="button" onClick={resetWall} className="px-2.5 py-1.5 bg-red-900/40 border border-red-500/30 text-red-400 rounded hover:bg-red-900/60 transition-colors">YES</button>
@@ -1230,7 +1240,10 @@ export default function InsideHead() {
                   : <button type="button" onClick={() => setConfirmResetWall(true)} className="px-4 py-2 border border-white/10 rounded hover:border-red-500/40 text-neutral-400 hover:text-red-400 flex items-center gap-1.5 interactive-item transition-colors">
                       <RotateCcw className="w-3.5 h-3.5" /> RESET
                     </button>
-              )}
+                : <button type="button" onClick={resetWall} className="px-4 py-2 border border-white/10 rounded hover:border-white/30 text-neutral-400 hover:text-white flex items-center gap-1.5 interactive-item transition-colors">
+                    <RotateCcw className="w-3.5 h-3.5" /> RESET
+                  </button>
+              }
               <button onClick={toggleAdmin} className={`px-4 py-2 border rounded flex items-center gap-2 interactive-item ${isAdminMode ? 'border-[#C62828] bg-[#C62828]/10 text-white' : 'border-white/10 text-neutral-400 hover:text-white'}`}>
                 {isAdminMode ? <Lock className="w-3.5 h-3.5 text-[#C62828]" /> : <Unlock className="w-3.5 h-3.5" />}
                 {isAdminMode ? 'ADMIN' : 'VISITOR'}
@@ -1483,8 +1496,8 @@ export default function InsideHead() {
                   </button>
                 </div>
               )}
-              {isAdminMode && (
-                confirmResetNotebook
+              {isAdminMode
+                ? confirmResetNotebook
                   ? <span className="flex items-center gap-1.5 font-mono text-[9px]">
                       <span className="text-amber-400">Sure?</span>
                       <button type="button" onClick={resetNotebook} className="px-2.5 py-1.5 bg-red-900/40 border border-red-500/30 text-red-400 rounded hover:bg-red-900/60 transition-colors">YES</button>
@@ -1493,7 +1506,10 @@ export default function InsideHead() {
                   : <button type="button" onClick={() => setConfirmResetNotebook(true)} className="px-4 py-2 border border-white/10 rounded hover:border-red-500/40 text-neutral-400 hover:text-red-400 flex items-center gap-1.5 interactive-item transition-colors">
                       <RotateCcw className="w-3.5 h-3.5" /> Reset
                     </button>
-              )}
+                : <button type="button" onClick={resetNotebook} className="px-4 py-2 border border-white/10 rounded hover:border-white/30 text-neutral-400 hover:text-white flex items-center gap-1.5 interactive-item transition-colors">
+                    <RotateCcw className="w-3.5 h-3.5" /> Reset
+                  </button>
+              }
               <button onClick={toggleAdmin} className={`px-4 py-2 border rounded flex items-center gap-2 interactive-item ${isAdminMode ? 'border-[#C62828] bg-[#C62828]/10 text-white' : 'border-white/10 text-neutral-400 hover:text-white'}`}>
                 {isAdminMode ? <Lock className="w-3.5 h-3.5 text-[#C62828]" /> : <Unlock className="w-3.5 h-3.5" />}
                 {isAdminMode ? 'ADMIN' : 'VISITOR'}
