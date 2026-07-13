@@ -18,6 +18,7 @@ import {
   formatFirebaseError
 } from '../lib/firebase';
 import FirebaseErrorModal, { FirebaseErrorDetails } from './FirebaseErrorModal';
+import { resolveImageUrl } from '../utils/urlHelper';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1410,7 +1411,7 @@ export default function InsideHead() {
                       {node.image && (
                         <div className="w-full aspect-video mb-2 overflow-hidden bg-neutral-900 rounded-sm border border-white/[0.05]">
                           <img 
-                            src={node.image} 
+                            src={resolveImageUrl(node.image)} 
                             alt={node.title} 
                             className="w-full h-full object-cover pointer-events-none" 
                             draggable={false} 
@@ -1883,7 +1884,7 @@ function NodeOverlayContent({ node, isAdminMode, onSave }: NodeOverlayContentPro
       {node.image && (
         <div className="w-full aspect-video overflow-hidden bg-black rounded border border-white/10">
           <img 
-            src={node.image} 
+            src={resolveImageUrl(node.image)} 
             alt={node.title} 
             className="w-full h-full object-cover" 
             loading="lazy"

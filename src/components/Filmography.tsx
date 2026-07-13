@@ -8,6 +8,7 @@ import { FilmographyProject, ProjectMediaItem } from '../types/project';
 import { DEFAULT_PROJECTS } from '../data/defaultProjects';
 import { isFirebaseConfigured, getFirebaseProjects, saveFirebaseProjects, formatFirebaseError } from '../lib/firebase';
 import FirebaseErrorModal, { FirebaseErrorDetails } from './FirebaseErrorModal';
+import { resolveImageUrl } from '../utils/urlHelper';
 
 const AUTH_TOKEN_KEY = 'himanshumer_admin_auth_token_v3';
 
@@ -266,12 +267,12 @@ export default function Filmography() {
   const getPrimaryMediaPreview = (project: FilmographyProject): string => {
     const primary = project.media[0];
     if (primary) {
-      if (primary.coverImage) return primary.coverImage;
-      if (primary.thumbnail) return primary.thumbnail;
-      if (primary.sourceType === 'local' && primary.type === 'image') return primary.url;
+      if (primary.coverImage) return resolveImageUrl(primary.coverImage);
+      if (primary.thumbnail) return resolveImageUrl(primary.thumbnail);
+      if (primary.sourceType === 'local' && primary.type === 'image') return resolveImageUrl(primary.url);
     }
-    if (project.presentation.coverImage) return project.presentation.coverImage;
-    if (project.presentation.thumbnail) return project.presentation.thumbnail;
+    if (project.presentation.coverImage) return resolveImageUrl(project.presentation.coverImage);
+    if (project.presentation.thumbnail) return resolveImageUrl(project.presentation.thumbnail);
     return 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=compress&cs=tinysrgb&w=800';
   };
 
@@ -1100,7 +1101,7 @@ export default function Filmography() {
                           className="relative aspect-video w-full rounded overflow-hidden bg-neutral-950 border border-white/10 shadow-inner group/hero cursor-pointer"
                         >
                           <img
-                            src={getPrimaryMediaPreview(project)}
+                            src={resolveImageUrl(getPrimaryMediaPreview(project))}
                             alt={project.content.title}
                             className="w-full h-full object-cover opacity-50 group-hover/hero:opacity-75 transition-opacity duration-500 filter contrast-105"
                             loading="lazy"
@@ -1642,7 +1643,7 @@ export default function Filmography() {
                   />
                   {editCoverImage && (
                     <div className="mt-2 aspect-video w-[240px] border border-white/10 rounded overflow-hidden">
-                      <img src={editCoverImage} className="w-full h-full object-cover" alt="Cover preview" />
+                      <img src={resolveImageUrl(editCoverImage)} className="w-full h-full object-cover" alt="Cover preview" />
                     </div>
                   )}
                 </div>
