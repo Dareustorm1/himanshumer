@@ -252,11 +252,10 @@ export default function InsideHead() {
         setBookmarks(firebaseNotebook.bookmarks);
         setIsNotebookLoading(false);
       } else {
-        // Fallback to local storage
-        // Brain Wall
+        // Fallback to local storage (only load adminSaved/nbAdmin for visitors to reset edits on refresh)
         const adminSaved   = localStorage.getItem(ADMIN_KEY);
         const visitorSaved = localStorage.getItem(VISITOR_KEY);
-        const wallData = visitorSaved || adminSaved;
+        const wallData = isCurrentlyAdmin ? (visitorSaved || adminSaved) : adminSaved;
         try {
           if (wallData) {
             const p = JSON.parse(wallData);
@@ -275,7 +274,7 @@ export default function InsideHead() {
         // Notebook
         const nbAdmin   = localStorage.getItem(NOTEBOOK_ADMIN_KEY);
         const nbVisitor = localStorage.getItem(NOTEBOOK_VISITOR_KEY);
-        const nbData = nbVisitor || nbAdmin;
+        const nbData = isCurrentlyAdmin ? (nbVisitor || nbAdmin) : nbAdmin;
         try {
           if (nbData) {
             const p = JSON.parse(nbData);
@@ -387,7 +386,7 @@ export default function InsideHead() {
   // ─── Persist ─────────────────────────────────────────────────────────────
 
   const saveWall = useCallback(async (ns: BrainNode[], cs: Connection[], admin: boolean) => {
-    if (isFirebaseConfigured) {
+    if (isFirebaseConfigured && admin) {
       await saveFirebaseNodes(ns as any);
       await saveFirebaseConnections(cs);
     } else {
@@ -398,7 +397,7 @@ export default function InsideHead() {
   }, []);
 
   const saveNotebook = useCallback(async (pages: NotebookPage[], folded: string[], bmarks: string[], admin: boolean) => {
-    if (isFirebaseConfigured) {
+    if (isFirebaseConfigured && admin) {
       await saveFirebaseNotebook(pages, folded, bmarks);
     } else {
       const key = admin ? NOTEBOOK_ADMIN_KEY : NOTEBOOK_VISITOR_KEY;
@@ -744,7 +743,7 @@ export default function InsideHead() {
 
   const resetWall = async () => {
     if (isAdminMode) {
-      // Admin: reload saved data from Firebase
+      // Admin: reload their own saved data from Firebase
       if (isFirebaseConfigured && db) {
         const firebaseNodes = await getFirebaseNodes(DEFAULT_NODES);
         const firebaseConnections = await getFirebaseConnections(DEFAULT_CONNECTIONS);
@@ -763,10 +762,23 @@ export default function InsideHead() {
       setHasUnsavedWall(false);
       setConfirmResetWall(false);
     } else {
-      // Visitor: wipe their local saved positions so refresh also resets
+      // Visitor: wipe their local overrides, reload the admin-saved layout from Firebase
       localStorage.removeItem(VISITOR_KEY);
-      setNodes(DEFAULT_NODES as any);
-      setConnections(DEFAULT_CONNECTIONS);
+      if (isFirebaseConfigured && db) {
+        const firebaseNodes = await getFirebaseNodes(DEFAULT_NODES);
+        const firebaseConnections = await getFirebaseConnections(DEFAULT_CONNECTIONS);
+        setNodes(firebaseNodes as any);
+        setConnections(firebaseConnections);
+      } else {
+        const admin = localStorage.getItem(ADMIN_KEY);
+        if (admin) {
+          const p = JSON.parse(admin);
+          setNodes(p.nodes || DEFAULT_NODES);
+          setConnections(p.connections || DEFAULT_CONNECTIONS);
+        } else {
+          setNodes(DEFAULT_NODES as any); setConnections(DEFAULT_CONNECTIONS);
+        }
+      }
     }
     setSelectedNodeId(null); setLinkFromId(null);
     setZoom(1); setPan({ x: 0, y: 0 });
