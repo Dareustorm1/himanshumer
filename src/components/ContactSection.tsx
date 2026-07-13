@@ -81,16 +81,12 @@ export default function ContactSection() {
   };
 
   const handleDownloadResume = () => {
-    const resumeText = `HIMANSHU MER - RESUME\nFilmmaker & Editor\nContact: himanshumer296@gmail.com`;
-    const blob = new Blob([resumeText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Himanshu_Mer_Resume.txt';
+    link.href = '/resume.pdf';
+    link.download = 'Himanshu_Mer_Resume.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   return (

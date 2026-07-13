@@ -23,14 +23,21 @@ export default function PressKit() {
   }, []);
 
   const handleDownloadFile = (type: 'resume' | 'cv' | 'headshot') => {
+    if (type === 'resume') {
+      const link = document.createElement('a');
+      link.href = '/resume.pdf';
+      link.download = 'Himanshu_Mer_Resume.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
     let content = '';
     let filename = '';
     let mimeType = 'text/plain';
 
-    if (type === 'resume') {
-      content = `HIMANSHU MER - RESUME\nFilmmaker & Editor\nContact: himanshumer296@gmail.com`;
-      filename = 'Himanshu_Mer_Resume.txt';
-    } else if (type === 'cv') {
+    if (type === 'cv') {
       content = `HIMANSHU MER - CV\nVisual Storyteller\nPortfolio: http://localhost:5173`;
       filename = 'Himanshu_Mer_CV.txt';
     } else {
