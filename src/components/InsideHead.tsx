@@ -95,7 +95,21 @@ export default function InsideHead() {
   const [activeOverlay, setActiveOverlay] = useState<{ title: string; content: React.ReactNode } | null>(null);
 
   // ── Brain Wall state ──
-  const [nodes,       setNodes]       = useState<BrainNode[]>([]);
+  const [rawNodes, setRawNodes] = useState<BrainNode[]>([]);
+  const nodes = rawNodes;
+  
+  const setNodes = useCallback((val: BrainNode[] | ((prev: BrainNode[]) => BrainNode[])) => {
+    setRawNodes((prev) => {
+      const next = typeof val === 'function' ? val(prev) : val;
+      return next.map(node => ({
+        ...node,
+        tags: Array.isArray(node.tags) 
+          ? node.tags.filter(t => t !== 'Inspiration') 
+          : []
+      }));
+    });
+  }, []);
+
   const [connections, setConnections] = useState<Connection[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [hoveredNodeId,  setHoveredNodeId]  = useState<string | null>(null);
@@ -109,6 +123,7 @@ export default function InsideHead() {
   const [newTitle, setNewTitle] = useState('');
   const [newDesc,  setNewDesc]  = useState('');
   const [newImg,   setNewImg]   = useState('');
+  const [newTag,   setNewTag]   = useState('');
   const [newType,  setNewType]  = useState<BrainNode['type']>('note');
 
   // ── Notebook state ──
@@ -693,7 +708,7 @@ export default function InsideHead() {
       type: newType,
       title: newTitle,
       desc: newDesc,
-      tags: ['Inspiration'],
+      tags: newTag.trim() ? newTag.split(',').map(t => t.trim()).filter(Boolean) : [],
       image: newImg || undefined,
       x: 20 + Math.random() * 50,
       y: 20 + Math.random() * 50,
@@ -703,7 +718,7 @@ export default function InsideHead() {
     };
     const updated = [...nodes, node];
     handleWallChange(updated, connections);
-    setNewTitle(''); setNewDesc(''); setNewImg('');
+    setNewTitle(''); setNewDesc(''); setNewImg(''); setNewTag('');
   };
 
   const togglePin = (id: string, e: React.MouseEvent) => {
@@ -1268,10 +1283,11 @@ export default function InsideHead() {
           {isAdminMode && (
             <form onSubmit={handleAddNode} className="p-5 border border-[#C62828]/20 bg-[#C62828]/5 rounded space-y-3 font-mono text-[9px]">
               <div className="text-[#C62828] font-bold uppercase tracking-widest">// ADMIN: Add Node</div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <input required value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Title" className="bg-neutral-900 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none" />
-                <input required value={newDesc}  onChange={e => setNewDesc(e.target.value)}  placeholder="Description" className="bg-neutral-900 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none" />
-                <input         value={newImg}   onChange={e => setNewImg(e.target.value)}   placeholder="Image URL (optional)" className="bg-neutral-900 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none" />
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <input required value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Title" className="bg-neutral-900 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none focus:border-white/20" />
+                <input required value={newDesc}  onChange={e => setNewDesc(e.target.value)}  placeholder="Description" className="bg-neutral-900 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none focus:border-white/20" />
+                <input         value={newImg}   onChange={e => setNewImg(e.target.value)}   placeholder="Image URL (optional)" className="bg-neutral-900 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none focus:border-white/20" />
+                <input         value={newTag}   onChange={e => setNewTag(e.target.value)}   placeholder="Tag (optional)" className="bg-neutral-900 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none focus:border-white/20" />
                 <div className="flex gap-2">
                   <select value={newType} onChange={e => setNewType(e.target.value as any)} className="flex-grow bg-neutral-900 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none uppercase">
                     {(['note','polaroid','ticket','location','quote'] as const).map(t => <option key={t} value={t}>{t}</option>)}
@@ -1807,6 +1823,7 @@ function NodeOverlayContent({ node, isAdminMode, onSave }: NodeOverlayContentPro
   const [desc, setDesc] = useState(node.desc);
   const [image, setImage] = useState(node.image || '');
   const [type, setType] = useState(node.type);
+  const [tagsInput, setTagsInput] = useState(node.tags.join(', '));
 
   const handleSave = () => {
     onSave({
@@ -1814,7 +1831,8 @@ function NodeOverlayContent({ node, isAdminMode, onSave }: NodeOverlayContentPro
       title: title.trim(),
       desc: desc.trim(),
       image: image.trim() || undefined,
-      type
+      type,
+      tags: tagsInput.split(',').map(t => t.trim()).filter(Boolean)
     });
     setIsEditing(false);
   };
@@ -1850,6 +1868,16 @@ function NodeOverlayContent({ node, isAdminMode, onSave }: NodeOverlayContentPro
             value={image}
             onChange={e => setImage(e.target.value)}
             className="w-full bg-neutral-950 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none focus:border-white/20"
+          />
+        </div>
+        <div>
+          <label className="text-neutral-500 block mb-1">TAGS (COMMA SEPARATED)</label>
+          <input
+            type="text"
+            value={tagsInput}
+            onChange={e => setTagsInput(e.target.value)}
+            className="w-full bg-neutral-950 border border-white/10 rounded px-2.5 py-1.5 text-white outline-none focus:border-white/20"
+            placeholder="Philosophy, Composition, etc..."
           />
         </div>
         <div>
