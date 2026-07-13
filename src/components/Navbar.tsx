@@ -105,7 +105,7 @@ export default function Navbar() {
   return (
     <>
       {/* 1. Desktop Layout: Fixed Vertical Film Strip (Left Side) */}
-      <nav className="fixed left-6 top-1/2 -translate-y-1/2 z-[49] hidden lg:flex flex-col bg-[#121212] border border-white/5 py-8 px-4 rounded w-36 shadow-2xl select-none font-mono text-[9px] uppercase tracking-widest text-neutral-400">
+      <nav className="fixed left-6 top-1/2 -translate-y-1/2 z-[49] hidden lg:flex flex-col bg-[#121212] border border-white/5 py-10 px-5 rounded w-44 shadow-2xl select-none font-mono text-[10px] uppercase tracking-widest text-neutral-400">
         
         {/* Left sprocket hole column */}
         <div className="absolute left-1.5 top-0 bottom-0 flex flex-col justify-between py-4 pointer-events-none opacity-20">
@@ -122,9 +122,9 @@ export default function Navbar() {
         </div>
 
         {/* Brand label */}
-        <div className="flex flex-col items-center gap-1 mb-8 border-b border-white/[0.04] pb-4 px-2 text-center text-white font-display-cinematic tracking-wider">
-          <Film className="w-4 h-4 text-neutral-500" />
-          <span className="text-[10px] mt-1">CINE // MER</span>
+        <div className="flex flex-col items-center gap-1 mb-8 border-b border-white/[0.04] pb-5 px-2 text-center text-white font-display-cinematic tracking-wider">
+          <Film className="w-5 h-5 text-neutral-500" />
+          <span className="text-[11px] mt-1">CINE // MER</span>
         </div>
 
         {/* Navigation list */}
@@ -136,7 +136,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => scrollToSection(e, link.href)}
-                className={`py-2 px-1 text-center rounded transition-all duration-350 flex items-center justify-center interactive-item font-body-cinematic font-semibold text-[8px] ${
+                className={`py-2.5 px-2 text-center rounded transition-all duration-350 flex items-center justify-center interactive-item font-body-cinematic font-semibold text-[10px] ${
                   isActive
                     ? 'border border-[var(--theme-accent,#D4AF37)] bg-white/[0.03] text-white'
                     : 'border border-transparent hover:border-white/5 text-neutral-500 hover:text-neutral-355'

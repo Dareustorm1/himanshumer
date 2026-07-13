@@ -216,7 +216,7 @@ function App() {
         {/* Global sticky translucent navigation */}
         <Navbar />
         
-        <main className={`transition-all duration-1000 lg:pl-[180px] pt-16 lg:pt-0 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+        <main className={`transition-all duration-1000 lg:pl-[200px] pt-16 lg:pt-0 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
           {/* Chapter 0: Hero Scene */}
           <Hero />
           

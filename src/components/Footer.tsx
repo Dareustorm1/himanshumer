@@ -41,7 +41,7 @@ export default function Footer() {
   return (
     <footer
       ref={footerRef}
-      className="relative bg-black min-h-[90vh] flex items-center justify-center overflow-hidden border-t border-white/[0.02] lg:pl-[180px]"
+      className="relative bg-black min-h-[90vh] flex items-center justify-center overflow-hidden border-t border-white/[0.02] lg:pl-[200px]"
     >
       {/* Projector flickering light flare */}
       {creditsPhase === 'rolling' && (
