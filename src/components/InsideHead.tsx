@@ -1336,8 +1336,8 @@ export default function InsideHead() {
                   return (
                     <line
                       key={i}
-                      x1={`${a.x + 6}%`} y1={`${a.y + 6}%`}
-                      x2={`${b.x + 6}%`} y2={`${b.y + 6}%`}
+                      x1={`${a.x}%`} y1={`${a.y}%`}
+                      x2={`${b.x}%`} y2={`${b.y}%`}
                       stroke={highlighted ? '#D4AF37' : '#ffffff'}
                       strokeWidth={highlighted ? 1.5 : 0.5}
                       strokeOpacity={highlighted ? 0.7 : 0.08}
@@ -1375,7 +1375,7 @@ export default function InsideHead() {
                       left: `${node.x}%`,
                       top:  `${node.y}%`,
                       width: `${NODE_SIZE_MAP[node.size]}px`,
-                      transform: `rotate(${node.rotation}deg) scale(${isHovered || isSelected ? 1.04 : 1})`,
+                      transform: `translate(-50%, -50%) rotate(${node.rotation}deg) scale(${isHovered || isSelected ? 1.04 : 1})`,
                       opacity: isDimmed ? 0.18 : 1,
                       filter: isDimmed ? 'blur(0.5px)' : 'none',
                       zIndex: isSelected ? 50 : isHovered ? 40 : 10,
