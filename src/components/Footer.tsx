@@ -82,7 +82,7 @@ export default function Footer() {
 
       {/* 2. Fade to Black Card */}
       {creditsPhase === 'fadeToBlack' && (
-        <div className="absolute inset-0 bg-[#080808] z-40 transition-opacity duration-1000 flex items-center justify-center">
+        <div className="absolute inset-0 bg-[#080808] z-40 transition-opacity duration-1000 flex items-center justify-center lg:pl-[200px]">
           <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-neutral-800 animate-pulse">
             SHUTTER DEFLATED
           </span>
@@ -102,7 +102,7 @@ export default function Footer() {
       )}
 
       {/* Frame specifications details */}
-      <div className="absolute bottom-6 left-6 right-6 flex justify-between text-[8px] font-mono text-neutral-800 tracking-widest uppercase pointer-events-none select-none">
+      <div className="absolute bottom-6 left-6 lg:left-[224px] right-6 flex justify-between text-[8px] font-mono text-neutral-800 tracking-widest uppercase pointer-events-none select-none">
         <span>FPS: 24.00</span>
         <span>SOUND: DOLBY CINE</span>
         <span>© {new Date().getFullYear()} HIMANSHU MER</span>
