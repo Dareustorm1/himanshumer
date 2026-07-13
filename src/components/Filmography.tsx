@@ -265,6 +265,11 @@ export default function Filmography() {
 
   // Media Priority Fallbacks
   const getPrimaryMediaPreview = (project: FilmographyProject): string => {
+    // 1. Explicit project-level presentation artwork (highest priority)
+    if (project.presentation.coverImage) return resolveImageUrl(project.presentation.coverImage);
+    if (project.presentation.thumbnail) return resolveImageUrl(project.presentation.thumbnail);
+
+    // 2. Media-item fallbacks (secondary priority)
     const primary = project.media[0];
     if (primary) {
       if (primary.coverImage) return resolveImageUrl(primary.coverImage);
@@ -275,8 +280,8 @@ export default function Filmography() {
       }
       if (primary.sourceType === 'local' && primary.type === 'image') return resolveImageUrl(primary.url);
     }
-    if (project.presentation.coverImage) return resolveImageUrl(project.presentation.coverImage);
-    if (project.presentation.thumbnail) return resolveImageUrl(project.presentation.thumbnail);
+
+    // 3. Default placeholder fallback
     return 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=compress&cs=tinysrgb&w=800';
   };
 
