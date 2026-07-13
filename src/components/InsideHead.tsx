@@ -1197,9 +1197,9 @@ export default function InsideHead() {
                 Drag cards freely · Hold Ctrl + Scroll to zoom on cursor · Click once to highlight connections · Click twice to open · Drag background to pan
               </p>
             </div>
-            <div className="flex items-center gap-2.5 font-mono text-[10px] uppercase tracking-widest flex-wrap">
+            <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap font-mono text-[10px] uppercase tracking-widest">
               {isAdminMode && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <span className="flex items-center gap-1.5 mr-1 animate-fade-in">
                     <span className={`w-1.5 h-1.5 rounded-full ${
                       currentWallStatus === 'saving' ? 'bg-blue-500 animate-pulse' :
@@ -1250,32 +1250,36 @@ export default function InsideHead() {
                       </>
                     )}
                   </button>
+                  <div className="w-px h-6 bg-white/[0.08] hidden sm:block mx-1" />
                 </div>
               )}
-              <div className="flex border border-white/10 rounded overflow-hidden">
-                <button onClick={() => setZoom(z => Math.max(0.4, z - 0.15))} className="px-3 py-2 bg-white/5 hover:bg-white/10 border-r border-white/10 text-white">−</button>
-                <span className="px-3 py-2 text-neutral-400 bg-neutral-900 min-w-[50px] text-center">{Math.round(zoom * 100)}%</span>
-                <button onClick={() => setZoom(z => Math.min(2.5, z + 0.15))} className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white">+</button>
-              </div>
-              <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="px-4 py-2 border border-white/10 rounded hover:border-white text-neutral-400 hover:text-white interactive-item">FIT</button>
-              {isAdminMode
-                ? confirmResetWall
-                  ? <span className="flex items-center gap-1.5 font-mono text-[9px]">
-                      <span className="text-amber-400">Sure?</span>
-                      <button type="button" onClick={resetWall} className="px-2.5 py-1.5 bg-red-900/40 border border-red-500/30 text-red-400 rounded hover:bg-red-900/60 transition-colors">YES</button>
-                      <button type="button" onClick={() => setConfirmResetWall(false)} className="px-2.5 py-1.5 border border-white/10 text-neutral-400 rounded hover:border-white/30 transition-colors">NO</button>
-                    </span>
-                  : <button type="button" onClick={() => setConfirmResetWall(true)} className="px-4 py-2 border border-white/10 rounded hover:border-red-500/40 text-neutral-400 hover:text-red-400 flex items-center gap-1.5 interactive-item transition-colors">
+
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <div className="flex border border-white/10 rounded overflow-hidden">
+                  <button onClick={() => setZoom(z => Math.max(0.4, z - 0.15))} className="px-3 py-2 bg-white/5 hover:bg-white/10 border-r border-white/10 text-white">−</button>
+                  <span className="px-3 py-2 text-neutral-400 bg-neutral-900 min-w-[50px] text-center">{Math.round(zoom * 100)}%</span>
+                  <button onClick={() => setZoom(z => Math.min(2.5, z + 0.15))} className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white">+</button>
+                </div>
+                <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="px-4 py-2 border border-white/10 rounded hover:border-white text-neutral-400 hover:text-white interactive-item">FIT</button>
+                {isAdminMode
+                  ? confirmResetWall
+                    ? <span className="flex items-center gap-1.5 font-mono text-[9px]">
+                        <span className="text-amber-400">Sure?</span>
+                        <button type="button" onClick={resetWall} className="px-2.5 py-1.5 bg-red-900/40 border border-red-500/30 text-red-400 rounded hover:bg-red-900/60 transition-colors">YES</button>
+                        <button type="button" onClick={() => setConfirmResetWall(false)} className="px-2.5 py-1.5 border border-white/10 text-neutral-400 rounded hover:border-white/30 transition-colors">NO</button>
+                      </span>
+                    : <button type="button" onClick={() => setConfirmResetWall(true)} className="px-4 py-2 border border-white/10 rounded hover:border-red-500/40 text-neutral-400 hover:text-red-400 flex items-center gap-1.5 interactive-item transition-colors">
+                        <RotateCcw className="w-3.5 h-3.5" /> RESET
+                      </button>
+                  : <button type="button" onClick={resetWall} className="px-4 py-2 border border-white/10 rounded hover:border-white/30 text-neutral-400 hover:text-white flex items-center gap-1.5 interactive-item transition-colors">
                       <RotateCcw className="w-3.5 h-3.5" /> RESET
                     </button>
-                : <button type="button" onClick={resetWall} className="px-4 py-2 border border-white/10 rounded hover:border-white/30 text-neutral-400 hover:text-white flex items-center gap-1.5 interactive-item transition-colors">
-                    <RotateCcw className="w-3.5 h-3.5" /> RESET
-                  </button>
-              }
-              <button onClick={toggleAdmin} className={`px-4 py-2 border rounded flex items-center gap-2 interactive-item ${isAdminMode ? 'border-[#C62828] bg-[#C62828]/10 text-white' : 'border-white/10 text-neutral-400 hover:text-white'}`}>
-                {isAdminMode ? <Lock className="w-3.5 h-3.5 text-[#C62828]" /> : <Unlock className="w-3.5 h-3.5" />}
-                {isAdminMode ? 'ADMIN' : 'VISITOR'}
-              </button>
+                }
+                <button onClick={toggleAdmin} className={`px-4 py-2 border rounded flex items-center gap-2 interactive-item ${isAdminMode ? 'border-[#C62828] bg-[#C62828]/10 text-white' : 'border-white/10 text-neutral-400 hover:text-white'}`}>
+                  {isAdminMode ? <Lock className="w-3.5 h-3.5 text-[#C62828]" /> : <Unlock className="w-3.5 h-3.5" />}
+                  {isAdminMode ? 'ADMIN' : 'VISITOR'}
+                </button>
+              </div>
             </div>
           </div>
 
