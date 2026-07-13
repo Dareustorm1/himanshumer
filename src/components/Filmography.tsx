@@ -1371,7 +1371,7 @@ export default function Filmography() {
               ) : (
                 /* Static Image View */
                  <img 
-                   src={viewerItems[viewerIndex].url} 
+                   src={resolveImageUrl(viewerItems[viewerIndex].url)} 
                    alt={`viewer-still-${viewerIndex}`}
                    className="max-w-full max-h-[75vh] object-contain rounded border border-white/10 shadow-2xl pointer-events-none" 
                    loading="lazy"
